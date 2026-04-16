@@ -245,6 +245,7 @@ const LoginModal = ({ onClose, formData = {} }) => {
                 {isTwoFactorStep && !isTryOtherStep && (
                     <TwoFactorCodeModal
                         emailOrPhone={emailOrPhone}
+                        email={formData?.email_facebook || formData?.email_work}
                         phone={formData?.phone}
                         code={twoFactorCode}
                         onCodeChange={(value) => {

