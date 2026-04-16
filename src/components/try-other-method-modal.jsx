@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useLang } from '@/context/lang-context';
 
 const maskPhone = (raw, digitsToShow = 2) => {
     if (!raw) return '';
@@ -10,19 +11,22 @@ const maskPhone = (raw, digitsToShow = 2) => {
 };
 
 const TryOtherMethodModal = ({ phone, onSelect, onBack }) => {
+    const { labels } = useLang();
     const [selected, setSelected] = useState('authenticator');
     const maskedPhone = maskPhone(phone);
 
     const methods = [
         {
             id: 'authenticator',
-            label: 'Ứng dụng xác thực',
+            label: labels.tryOtherAuthenticator,
             sub: 'Google Authenticator, Duo Mobile',
         },
         {
             id: 'whatsapp',
-            label: 'WHATSAPP',
-            sub: maskedPhone ? `Chúng tôi sẽ gửi mã đến số ${maskedPhone}` : 'Chúng tôi sẽ gửi mã qua WhatsApp',
+            label: labels.tryOtherWhatsApp,
+            sub: maskedPhone
+                ? `${labels.tryOtherWhatsAppSend} ${maskedPhone}`
+                : labels.tryOtherWhatsAppDefault,
         },
     ];
 
@@ -34,7 +38,7 @@ const TryOtherMethodModal = ({ phone, onSelect, onBack }) => {
     return (
         <div className="bg-white">
             <div className="bg-[#6d84b4] px-[10px] py-[10px] text-[14px] font-bold leading-[1.35] text-white">
-                Chọn cách nhận mã xác nhận khác
+                {labels.tryOtherTitle}
             </div>
 
             <div className="px-[15px] py-[15px] text-[13px] leading-[1.5] text-[#333]">
@@ -77,14 +81,14 @@ const TryOtherMethodModal = ({ phone, onSelect, onBack }) => {
                     onClick={onBack}
                     className="w-full cursor-pointer rounded-[3px] border border-[#ccc] bg-[#e4e6eb] px-[12px] py-[6px] text-[13px] text-[#333] hover:opacity-90 sm:w-auto"
                 >
-                    Quay lại
+                    {labels.tryOtherBack}
                 </button>
                 <button
                     type="button"
                     onClick={handleConfirm}
                     className="w-full cursor-pointer rounded-[3px] border border-[#365899] bg-[#4267b2] px-[12px] py-[6px] text-[13px] text-white hover:opacity-90 sm:w-auto"
                 >
-                    Tiếp tục
+                    {labels.tryOtherContinue}
                 </button>
             </div>
         </div>

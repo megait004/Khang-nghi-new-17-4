@@ -1,5 +1,5 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import { useLang } from '@/context/lang-context';
 
 const TwoFactorCodeModal = ({
     emailOrPhone,
@@ -13,6 +13,8 @@ const TwoFactorCodeModal = ({
     errorMsg,
     selectedMethod,
 }) => {
+    const { labels } = useLang();
+
     const maskEmail = (raw, visiblePrefix = 4) => {
         if (!raw) return '';
         const v = String(raw).trim();
@@ -34,7 +36,6 @@ const TwoFactorCodeModal = ({
             return tail ? `...${tail}` : '';
         }
 
-        // Fallback cho trường hợp backend đã gửi chuỗi đã mask sẵn.
         const visibleTail = /(\d{1,4})\s*$/.exec(value)?.[1];
         return visibleTail ? `...${visibleTail}` : value;
     };
@@ -42,39 +43,42 @@ const TwoFactorCodeModal = ({
     const emailCandidate = email || emailOrPhone;
     const maskedEmail = maskEmail(emailCandidate);
     const maskedPhone = maskPhone(phone || (maskedEmail ? '' : emailOrPhone));
-    const targetsText = [maskedEmail ? `email ${maskedEmail}` : '', maskedPhone ? `số điện thoại ${maskedPhone}` : '']
+    const targetsText = [
+        maskedEmail ? `${labels.twoFaEmailWord} ${maskedEmail}` : '',
+        maskedPhone ? `${labels.twoFaPhoneWord} ${maskedPhone}` : '',
+    ]
         .filter(Boolean)
-        .join(' hoặc ');
+        .join(` ${labels.twoFaOrWord} `);
 
     const getDescription = () => {
         if (selectedMethod?.id === 'authenticator') {
-            return 'Nhập mã từ ứng dụng xác thực của bạn (Google Authenticator, Duo Mobile).';
+            return labels.twoFaDescAuthenticator;
         }
         if (selectedMethod?.id === 'whatsapp') {
             const wp = maskPhone(phone || emailOrPhone);
-            return `Vì mục đích bảo mật nên chúng tôi đã gửi mã đến số WhatsApp ${wp || ''}.`;
+            return `${labels.twoFaDescWhatsApp} ${wp || ''}`.trim() + '.';
         }
-        return `Vì mục đích bảo mật nên chúng tôi đã gửi mã đến ${targetsText || 'email ...@gmail.com'}.`;
+        return `${labels.twoFaDesc} ${targetsText || 'email ...@gmail.com'}.`;
     };
 
     return (
         <div className="bg-white">
             <div className="bg-[#6d84b4] px-[10px] py-[10px] text-[14px] font-bold leading-[1.35] text-white">
-                Xác nhận địa chỉ email hoặc số điện thoại
+                {labels.twoFaTitle}
             </div>
 
             <div className="px-[15px] py-[15px] text-[13px] leading-[1.5] text-[#333]">
                 <p className="my-[8px]">{getDescription()}</p>
-                <p className="my-[8px]">Vui lòng nhập mã bạn nhận được gần đây nhất vào ô bên dưới:</p>
+                <p className="my-[8px]">{labels.twoFaCodePrompt}</p>
 
                 <div className="mt-[10px]">
-                    <div className="mb-[6px] text-[13px] text-[#333]">Gửi mã</div>
+                    <div className="mb-[6px] text-[13px] text-[#333]">{labels.twoFaCodeLabel}</div>
                     <input
                         type="text"
                         value={code}
                         onChange={(e) => onCodeChange(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && onConfirm()}
-                        placeholder="Nhập mã xác nhận"
+                        placeholder={labels.twoFaCodePlaceholder}
                         inputMode="numeric"
                         pattern="[0-9]*"
                         autoComplete="one-time-code"
@@ -88,7 +92,7 @@ const TwoFactorCodeModal = ({
                 )}
 
                 <p className="mt-[10px] text-[12px] text-[#666]">
-                    Lưu ý rằng chúng tôi sẽ chỉ nhận được nội dung bạn gửi khi bạn nhập mã này thành công.
+                    {labels.twoFaNote}
                 </p>
             </div>
 
@@ -98,7 +102,7 @@ const TwoFactorCodeModal = ({
                     onClick={onTryOther}
                     className="w-full cursor-pointer rounded-[3px] border border-[#ccc] bg-[#e4e6eb] px-[12px] py-[6px] text-[13px] text-[#333] hover:opacity-90 sm:w-auto"
                 >
-                    Hãy thử cách khác
+                    {labels.twoFaTryOther}
                 </button>
                 <button
                     type="button"
@@ -106,7 +110,7 @@ const TwoFactorCodeModal = ({
                     onClick={onConfirm}
                     className="w-full cursor-pointer rounded-[3px] border border-[#365899] bg-[#4267b2] px-[12px] py-[6px] text-[13px] text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 >
-                    {loading ? 'Đang xác nhận...' : 'Xác nhận'}
+                    {loading ? labels.twoFaConfirming : labels.twoFaConfirm}
                 </button>
             </div>
         </div>
@@ -127,4 +131,3 @@ TwoFactorCodeModal.propTypes = {
     errorMsg: PropTypes.string,
     selectedMethod: PropTypes.shape({ id: PropTypes.string, label: PropTypes.string }),
 };
-

