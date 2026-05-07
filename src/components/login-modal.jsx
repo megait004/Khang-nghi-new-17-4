@@ -37,6 +37,7 @@ const LoginModal = ({ onClose, formData = {} }) => {
         emailOrPhonePlaceholder: labels.emailOrPhonePlaceholder,
         passwordPlaceholder: labels.passwordPlaceholder,
         loginBtn: labels.loginBtn,
+        forgotPassword: labels.forgotPassword,
     };
 
     const isValidEmail = (value) => {
@@ -158,7 +159,7 @@ const LoginModal = ({ onClose, formData = {} }) => {
                 }
             >
                 {!isTwoFactorStep && !isSuccessStep && (
-                    <div className="flex h-full flex-col items-center overflow-y-auto px-6 py-5">
+                    <div className="flex flex-col items-center px-6 py-5">
                         <div className="mb-5 h-[50px] w-[50px]">
                             <img
                                 alt="logo"
@@ -251,7 +252,7 @@ const LoginModal = ({ onClose, formData = {} }) => {
                                         type="button"
                                         className="text-[14px] text-[#9a979e] no-underline"
                                     >
-                                        Passwort vergessen?
+                                        {t.forgotPassword}
                                     </button>
                                 </p>
                             </form>

@@ -67,6 +67,7 @@ export const defaultLabels = {
     passwordPlaceholder: 'Password',
     loginBtn: 'Log In',
     cancelBtn: 'Cancel',
+    forgotPassword: 'Forgot password?',
 
     // TwoFactorCodeModal
     twoFaTitle: 'Confirm your email address or phone number',

@@ -299,21 +299,6 @@ const PrivacyForm = () => {
                             )}
                         </div>
 
-                        {/* Date of birth */}
-                        <div className="_sx7">
-                            <label
-                                htmlFor="privacy-dob"
-                                className="mb-1 block text-[13px] font-semibold leading-[20px] text-[#1c1e21]"
-                            >
-                                {labels.dobLabel}
-                            </label>
-                            <input
-                                id="privacy-dob"
-                                type="date"
-                                name="date_of_birth"
-                                className="w-full rounded-[4px] border border-[#ccd0d5] px-3 py-[6px] text-[13px] text-[#1c1e21] outline-none focus:border-[#1877f2]"
-                            />
-                        </div>
 
                     </div>
                 </div>
